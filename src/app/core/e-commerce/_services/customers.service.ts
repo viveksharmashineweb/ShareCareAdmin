@@ -8,7 +8,7 @@ import { HttpUtilsService, QueryParamsModel, QueryResultsModel } from '../../_ba
 // Models
 import { CustomerModel } from '../_models/customer.model';
 
-const API_CUSTOMERS_URL = 'api/customers';
+const API_CUSTOMERS_URL = 'http://52.221.206.60:3005/';
 
 @Injectable()
 export class CustomersService {
@@ -23,9 +23,11 @@ export class CustomersService {
 
 	// READ
 	getAllCustomers(): Observable<CustomerModel[]> {
-		return this.http.get<CustomerModel[]>(API_CUSTOMERS_URL);
+		console.log('getv all customers');
+		return this.http.get<CustomerModel[]>(API_CUSTOMERS_URL+'admin/adminGetAllUsers');
 	}
 
+	
 	getCustomerById(customerId: number): Observable<CustomerModel> {
 		return this.http.get<CustomerModel>(API_CUSTOMERS_URL + `/${customerId}`);
 	}

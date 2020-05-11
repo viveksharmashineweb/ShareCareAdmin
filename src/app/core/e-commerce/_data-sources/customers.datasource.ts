@@ -24,6 +24,7 @@ export class CustomersDataSource extends BaseDataSource {
 		this.store.pipe(
 			select(selectCustomersInStore),
 		).subscribe((response: QueryResultsModel) => {
+			console.log(response , 'response data ')
 			this.paginatorTotalSubject.next(response.totalCount);
 			this.entitySubject.next(response.items);
 		});

@@ -8,18 +8,35 @@ import { catchError, map } from 'rxjs/operators';
 import { QueryParamsModel, QueryResultsModel } from '../../_base/crud';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
-
-const API_USERS_URL = 'api/users';
+const API_USERS_URL = ''
+const API_USERS_URL1 = 'http://52.221.206.60:3005/';
 const API_PERMISSION_URL = 'api/permissions';
 const API_ROLES_URL = 'api/roles';
 
 @Injectable()
 export class AuthService {
     constructor(private http: HttpClient) {}
+
     // Authentication/Authorization
-    login(email: string, password: string): Observable<User> {
-        return this.http.post<User>(API_USERS_URL, { email, password });
+    login(email: string, password: string): Observable<any> {
+        console.log(email , password ,'nfkdnfdkfndkfdkkdjfkdjfgd')
+        return this.http.post<any>(API_USERS_URL1+'admin/adminLogin', { email, password });
     }
+
+
+    // Method from server should return QueryResultsModel(items: any[], totalsCount: number)
+	// items => filtered/sorted result
+	findUsers(type): Observable<any> {
+        // const httpHeaders = new HttpHeaders();
+        // httpHeaders.set('Content-Type', 'application/json');
+       return this.http.post<any>(API_USERS_URL1 + 'admin/adminGetAllUsers', {type});
+     }
+
+
+
+
+     
+
 
     getUserByToken(): Observable<User> {
         const userToken = localStorage.getItem(environment.authTokenKey);
@@ -84,13 +101,7 @@ export class AuthService {
 		   return this.http.post<User>(API_USERS_URL, user, { headers: httpHeaders});
 	}
 
-    // Method from server should return QueryResultsModel(items: any[], totalsCount: number)
-	// items => filtered/sorted result
-	findUsers(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
-        const httpHeaders = new HttpHeaders();
-        httpHeaders.set('Content-Type', 'application/json');
-		      return this.http.post<QueryResultsModel>(API_USERS_URL + '/findUsers', queryParams, { headers: httpHeaders});
-    }
+    
 
     // Permission
     getAllPermissions(): Observable<Permission[]> {

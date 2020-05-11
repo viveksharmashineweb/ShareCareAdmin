@@ -28,6 +28,7 @@ export class CustomersService {
 
 	// READ
 	getAllCustomers(): Observable<CustomerModel[]> {
+		console.log('get all customers here');
 		return this.http.get<CustomerModel[]>(API_CUSTOMERS_URL);
 	}
 

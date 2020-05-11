@@ -11,14 +11,15 @@ import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../core/reducers';
 // Auth
-import { AuthNoticeService, AuthService, Login } from '../../../../core/auth';
+import { AuthNoticeService,AuthService, Login } from '../../../../core/auth';
+//import {AuthService} from '../../../../core/auth/_services/auth.service'
 
 /**
  * ! Just example => Should be removed in development
  */
 const DEMO_PARAMS = {
-	EMAIL: 'admin@demo.com',
-	PASSWORD: 'demo'
+	EMAIL: '',
+	PASSWORD: ''
 };
 
 @Component({
@@ -96,12 +97,12 @@ export class LoginComponent implements OnInit, OnDestroy {
 	 */
 	initLoginForm() {
 		// demo message to show
-		if (!this.authNoticeService.onNoticeChanged$.getValue()) {
-			const initialNotice = `Use account
-			<strong>${DEMO_PARAMS.EMAIL}</strong> and password
-			<strong>${DEMO_PARAMS.PASSWORD}</strong> to continue.`;
-			this.authNoticeService.setNotice(initialNotice, 'info');
-		}
+		// if (!this.authNoticeService.onNoticeChanged$.getValue()) {
+		// 	const initialNotice = `Use account
+		// 	<strong>${DEMO_PARAMS.EMAIL}</strong> and password
+		// 	<strong>${DEMO_PARAMS.PASSWORD}</strong> to continue.`;
+		// 	this.authNoticeService.setNotice(initialNotice, 'info');
+		// }
 
 		this.loginForm = this.fb.group({
 			email: [DEMO_PARAMS.EMAIL, Validators.compose([
@@ -143,7 +144,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 			.login(authData.email, authData.password)
 			.pipe(
 				tap(user => {
-					if (user) {
+					if (user.code == 200) {
+						console.log(user , 'userdata');
 						this.store.dispatch(new Login({authToken: user.accessToken}));
 						this.router.navigateByUrl(this.returnUrl); // Main page
 					} else {

@@ -27,14 +27,8 @@ import {
 	selectAllRoles
 } from '../../../../../core/auth';
 import { SubheaderService } from '../../../../../core/_base/layout';
+import { AuthService} from '../../../../../core/auth/_services/auth.service'
 
-// Table with EDIT item in MODAL
-// ARTICLE for table with sort/filter/paginator
-// https://blog.angular-university.io/angular-material-data-table/
-// https://v5.material.angular.io/components/table/overview
-// https://v5.material.angular.io/components/sort/overview
-// https://v5.material.angular.io/components/table/overview#sorting
-// https://www.youtube.com/watch?v=NSt9CI3BXv4
 @Component({
 	selector: 'kt-users-list',
 	templateUrl: './users-list.component.html',
@@ -43,7 +37,7 @@ import { SubheaderService } from '../../../../../core/_base/layout';
 export class UsersListComponent implements OnInit, OnDestroy {
 	// Table fields
 	dataSource: UsersDataSource;
-	displayedColumns = ['select', 'id', 'username', 'email', 'fullname', '_roles', 'actions'];
+	displayedColumns = [ 'email', 'mobile_No', 'status', 'actions'];
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 	@ViewChild('sort1', {static: true}) sort: MatSort;
 	// Filter fields
@@ -56,6 +50,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
 
 	// Subscriptions
 	private subscriptions: Subscription[] = [];
+	type: number;
 
 	/**
 	 *
@@ -69,6 +64,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
 		private activatedRoute: ActivatedRoute,
 		private store: Store<AppState>,
 		private router: Router,
+		private auth : AuthService,
 		private layoutUtilsService: LayoutUtilsService,
 		private subheaderService: SubheaderService,
 		private cdr: ChangeDetectorRef) {}
@@ -81,9 +77,24 @@ export class UsersListComponent implements OnInit, OnDestroy {
 	 * On init
 	 */
 	ngOnInit() {
+		   this.type=1;
+         //get user data section start
+		 this.auth.findUsers(this.type).pipe().subscribe(data =>{
+			console.log(data,'yogesh.shineweb@gmail.com');
+			if(data.code == 200){
+	        this.dataSource = data.result;
+			}else{
+				//this.toastr.error('error',data.message);
+					//return;
+			}
+		})
+
+
+
+
 		// load roles list
-		const rolesSubscription = this.store.pipe(select(selectAllRoles)).subscribe(res => this.allRoles = res);
-		this.subscriptions.push(rolesSubscription);
+		//const rolesSubscription = this.store.pipe(select(selectAllRoles)).subscribe(res => this.allRoles = res);
+		//this.subscriptions.push(rolesSubscription);
 
 		// If the user changes the sort order, reset back to the first page.
 		const sortSubscription = this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
@@ -178,21 +189,42 @@ export class UsersListComponent implements OnInit, OnDestroy {
 	 */
 	deleteUser(_item: User) {
 		const _title = 'User Delete';
-		const _description = 'Are you sure to permanently delete this user?';
+		const _description = 'Are you sure to  deactivate this user?';
 		const _waitDesciption = 'User is deleting...';
 		const _deleteMessage = `User has been deleted`;
 
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
+			console.log('enter here to delet data')
+
 			if (!res) {
 				return;
 			}
-
 			this.store.dispatch(new UserDeleted({ id: _item.id }));
 			this.layoutUtilsService.showActionNotification(_deleteMessage, MessageType.Delete);
 		});
 	}
+	getItemCssClassByStatus(status: Boolean ): string {
+		switch (status) {
+			case false:
+				return 'danger';
+			case true:
+				return 'success';
+		}
+		return '';
+	}
 
+	getItemStatusString(status: Boolean): string {
+		switch (status) {
+			case false:
+				return 'Suspended';
+			case true:
+				return 'Active';
+			// case 2:
+			// 	return 'Pending';
+		}
+		return '';
+	}
 	/**
 	 * Fetch selected rows
 	 */
@@ -235,6 +267,8 @@ export class UsersListComponent implements OnInit, OnDestroy {
 	 * @param user: User
 	 */
 	getUserRolesStr(user: User): string {
+
+		console.log(user , 'this. data');
 		const titles: string[] = [];
 		each(user.roles, (roleId: number) => {
 			const _role = find(this.allRoles, (role: Role) => role.id === roleId);

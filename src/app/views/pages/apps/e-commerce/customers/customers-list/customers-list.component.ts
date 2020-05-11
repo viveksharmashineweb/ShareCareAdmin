@@ -18,15 +18,7 @@ import { CustomerModel, CustomersDataSource, CustomersPageRequested, OneCustomer
 // Components
 import { CustomerEditDialogComponent } from '../customer-edit/customer-edit.dialog.component';
 
-// Table with EDIT item in MODAL
-// ARTICLE for table with sort/filter/paginator
-// https://blog.angular-university.io/angular-material-data-table/
-// https://v5.material.angular.io/compgetItemCssClassByStatusonents/table/overview
-// https://v5.material.angular.io/components/sort/overview
-// https://v5.material.angular.io/components/table/overview#sorting
-// https://www.youtube.com/watch?v=NSt9CI3BXv4
 @Component({
-	// tslint:disable-next-line:component-selector
 	selector: 'kt-customers-list',
 	templateUrl: './customers-list.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,7 +27,7 @@ import { CustomerEditDialogComponent } from '../customer-edit/customer-edit.dial
 export class CustomersListComponent implements OnInit, OnDestroy {
 	// Table fields
 	dataSource: CustomersDataSource;
-	displayedColumns = ['select', 'id', 'lastName', 'firstName', 'email', 'gender', 'status', 'type', 'actions'];
+	displayedColumns = [ 'firstName','lastName',  'email', 'status', 'type', 'actions'];
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 	@ViewChild('sort1', {static: true}) sort: MatSort;
 	// Filter fields
@@ -65,9 +57,6 @@ export class CustomersListComponent implements OnInit, OnDestroy {
 		private store: Store<AppState>
 	) { }
 
-	/**
-	 * @ Lifecycle sequences => https://angular.io/guide/lifecycle-hooks
-	 */
 
 	/**
 	 * On init
@@ -77,10 +66,7 @@ export class CustomersListComponent implements OnInit, OnDestroy {
 		const sortSubscription = this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 		this.subscriptions.push(sortSubscription);
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
+
 		const paginatorSubscriptions = merge(this.sort.sortChange, this.paginator.page).pipe(
 			tap(() => this.loadCustomersList())
 		)
@@ -102,11 +88,13 @@ export class CustomersListComponent implements OnInit, OnDestroy {
 
 		// Init DataSource
 		this.dataSource = new CustomersDataSource(this.store);
+		console.log(	this.dataSource , 'this is data source')
 		const entitiesSubscription = this.dataSource.entitySubject.pipe(
 			skip(1),
 			distinctUntilChanged()
 		).subscribe(res => {
 			this.customersResult = res;
+			console.log(this.customersResult ,'this custyomer resiult')
 		});
 		this.subscriptions.push(entitiesSubscription);
 		// First load
